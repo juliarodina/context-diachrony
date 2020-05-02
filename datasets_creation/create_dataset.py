@@ -2,17 +2,18 @@ import pandas as pd
 import gensim
 from scipy.stats import percentileofscore
 import random
+import numpy as np
 
-with open('handpicked_words.txt', 'r') as f:
+with open('words_0.txt', 'r') as f:
     words = f.read().splitlines()
 
 print('gold dataset length: ', len(words))
 dic = {}
 
-emb_model_0 = gensim.models.KeyedVectors.load_word2vec_format('./macro/models/soviet.bin.gz',
+emb_model_0 = gensim.models.KeyedVectors.load_word2vec_format('../macro/models_static/pre-soviet.bin.gz',
                                                             binary=True, unicode_errors='replace')
 print('model 1 loaded')
-emb_model_1 = gensim.models.KeyedVectors.load_word2vec_format('./macro/models/post-soviet.bin.gz',
+emb_model_1 = gensim.models.KeyedVectors.load_word2vec_format('../macro/models_static/soviet.bin.gz',
                                                             binary=True, unicode_errors='replace')
 print('model 2 loaded')
 
@@ -27,14 +28,21 @@ def get_freqdict(wordlist, vocablist, corpus_size, return_percentiles=True):
     all_freqs = []
     word_freq = {}
     for word in wordlist:
+        # print(word)
         counts = [vocab[word].count for vocab in vocablist]
         # print(counts)
         frequency = [counts[i] / corpus_size[i] for i in range(len(vocablist))]
-        # print(frequency)
         mean_frequency = sum(frequency) / len(frequency)
         # print(mean_frequency)
-        all_freqs.append(mean_frequency)
         word_freq[word] = mean_frequency
+        # print('='*80)
+
+    intersec = set.intersection(*map(set, vocablist))
+    for word in intersec:
+        counts = [vocab[word].count for vocab in vocablist]
+        frequency = [counts[i] / corpus_size[i] for i in range(len(vocablist))]
+        mean_frequency = sum(frequency) / len(frequency)
+        all_freqs.append(mean_frequency)
     # print(all_freqs)
     # print(word_freq)
 
@@ -42,6 +50,7 @@ def get_freqdict(wordlist, vocablist, corpus_size, return_percentiles=True):
         percentiles = {}
         for word in wordlist:
             percentiles[word] = int(percentileofscore(all_freqs, word_freq[word]))
+            # print(word, 'freq--- ', word_freq[word], 'perc--- ', percentiles[word])
         return percentiles
 
     else:
@@ -60,6 +69,7 @@ def output_results(evaluative_dict, rest_dict):
     for i in evaluative_dict:
         print('target: ', i)
         perc = evaluative_dict[i]
+        print(perc)
         try:
             sl = random.sample(rest_dict_inv[perc], 4)
         except (ValueError, KeyError):
@@ -112,8 +122,8 @@ for voc_word in intersec:
     elif voc_word.endswith('ADJ') and voc_word not in words:
         filler_adj.add(voc_word)
 
-filler_noun = delete_lowfrequent(filler_noun, 5000, vocablist)
-filler_adj = delete_lowfrequent(filler_adj, 5000, vocablist)
+filler_noun = delete_lowfrequent(filler_noun, 0, vocablist)
+filler_adj = delete_lowfrequent(filler_adj, 0, vocablist)
 
 fillerfreq_noun = get_freqdict(filler_noun, vocablist, corpus_size)
 fillerfreq_adj = get_freqdict(filler_adj, vocablist, corpus_size)

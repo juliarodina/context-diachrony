@@ -1,13 +1,15 @@
 import pandas as pd
+import random
 
-with open('handpicked_words.txt', 'r') as f:
+with open('words_1.txt', 'r') as f:
     words = f.read().splitlines()
     # print(words)
 
-with open('filtered_fillers', 'r') as f:
+with open('fillers_1.txt', 'r') as f:
     fillers = f.read().splitlines()
     # print(fillers)
-
+fillers = random.sample(fillers, 27)
+print(fillers)
 dic = {}
 
 for w in words:
