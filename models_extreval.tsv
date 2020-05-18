@@ -1,0 +1,7 @@
+model	ParaPhraser
+all	Precision: 0.528 Recall: 0.553 F1: 0.522
+presoviet	Precision: 0.461 Recall: 0.490 F1: 0.442
+soviet	Precision: 0.475 Recall: 0.501 F1: 0.458
+postsoviet	Precision: 0.468 Recall: 0.496 F1: 0.452
+soviet_incremental	Precision: 0.527 Recall: 0.552 F1: 0.523
+postsoviet_incremental	Precision: 0.546 Recall: 0.568 F1: 0.544
